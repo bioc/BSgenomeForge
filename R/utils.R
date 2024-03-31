@@ -6,6 +6,16 @@
 ###
 
 
+### TODO: Move this to S4Vectors (or BiocBaseUtils).
+load_package_gracefully <- function(package, ...)
+{
+    if (!requireNamespace(package, quietly=TRUE))
+        stop("Could not load package ", package, ". Is it installed?\n\n  ",
+             wmsg("Note that ", ..., " requires the ", package, " package. ",
+                  "Please install it with:"),
+             "\n\n    BiocManager::install(\"", package, "\")")
+}
+
 ### Returns TRUE if 'assembly_accession' is a GenBank accession, or FALSE
 ### if it's a RefSeq accession, or an error if it's none.
 is_GenBank_accession <- function(assembly_accession)

@@ -1,5 +1,5 @@
 import(methods)
-importFrom(utils,download.file)
+importFrom(utils, download.file, installed.packages, str)
 importFrom(stats, setNames)
 
 import(BiocGenerics)
@@ -7,12 +7,63 @@ importFrom(Biobase, createPackage)
 import(S4Vectors)
 import(IRanges)
 import(GenomeInfoDb)
+import(GenomicRanges)
 import(Biostrings)
-import(rtracklayer)
+importFrom(BiocIO, import)
+importFrom(rtracklayer, TwoBitFile, import.2bit, export.2bit)
 import(BSgenome)
 
-export(downloadGenomicSequencesFromNCBI)
-export(downloadGenomicSequencesFromUCSC)
-export(fastaTo2bit)
-export(forgeBSgenomeDataPkgFromNCBI)
-export(forgeBSgenomeDataPkgFromUCSC)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 classes
+###
+
+exportClasses(
+    BSgenomeDataPkgSeed
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export non-generic functions
+###
+
+export(
+    ## downloadGenomicSequencesFromNCBI.R:
+    downloadGenomicSequencesFromNCBI,
+
+    ## downloadGenomicSequencesFromUCSC.R:
+    downloadGenomicSequencesFromUCSC,
+
+    ## fastaTo2bit.R:
+    fastaTo2bit,
+
+    ## forgeBSgenomeDataPkgFromNCBI.R:
+    forgeBSgenomeDataPkgFromNCBI,
+
+    ## forgeBSgenomeDataPkgFromUCSC.R:
+    forgeBSgenomeDataPkgFromUCSC,
+
+    ## AdvancedBSgenomeForge.R:
+    forgeSeqlengthsRdsFile,
+    forgeSeqlengthsRdaFile,
+    forgeSeqFiles,
+    forgeMasksFiles
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 generics defined in BSgenomeForge, and corresponding methods
+###
+
+export(
+    ## AdvancedBSgenomeForge.R:
+    forgeBSgenomeDataPkg,
+    forgeMaskedBSgenomeDataPkg
+)
+
+### Same list as above.
+exportMethods(
+    forgeBSgenomeDataPkg,
+    forgeMaskedBSgenomeDataPkg
+)
+

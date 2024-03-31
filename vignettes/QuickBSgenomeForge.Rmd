@@ -1,12 +1,12 @@
 ---
-title: "How to use the BSgenomeForge package to forge a BSgenome data package"
+title: "A quick introduction to the BSgenomeForge package"
 author:
 - name: "Atuhurira Kirabo Kakopo"
 - name: "Hervé Pagès"
-date: "Modified: June 20, 2023; Compiled: `r format(Sys.time(), '%B %d, %Y')`"
+date: "Modified: March 30, 2024; Compiled: `r format(Sys.time(), '%B %d, %Y')`"
 package: BSgenomeForge
 vignette: |
-  %\VignetteIndexEntry{How to use the BSgenomeForge package to forge a BSgenome data package}
+  %\VignetteIndexEntry{A quick introduction to the BSgenomeForge package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 output:
@@ -33,21 +33,17 @@ _UCSC genomes_ (i.e. genomes supported by the UCSC Genome Browser) or
 _NCBI assemblies_. The packages are used in various Bioconductor workflows, as
 well as in man page examples and vignettes of other Bioconductor packages,
 typically in conjunction with tools available in the
-`r Biocpkg("BSgenomeForge")` and `r Biocpkg("Biostrings")` software packages.
+`r Biocpkg("BSgenome")` and `r Biocpkg("Biostrings")` software packages.
 New BSgenome data packages get added on a regular basis, based on user demand.
 
-The current process of forging a BSgenome data package requires one to download
-the sequence data files, either as a single twoBit file (e.g. musFur1.2bit) or
-in a collection of compressed FASTA files. The user then needs to prepare the
-BSgenome data package seed file, and then call `forgeBSgenomeDataPkg` function
-on the seed file to forge the package. This is quite a convoluted task that can
-be an inconvenience for the average user.
+The `r Biocpkg("BSgenomeForge")` package provides tools that allow the user
+to make their own BSgenome data package. The two primary tools in the package
+are the `forgeBSgenomeDataPkgfromNCBI` and `forgeBSgenomeDataPkgfromUCSC`
+functions. These functions allow the user to forge a BSgenome data package
+for a given NCBI assembly or UCSC genome.
 
-The BSgenomeForge package simplifies the whole process, by allowing the user to
-use one function to create a BSgenome data package. It is comprised of two main
-functions: `forgeBSgenomeDataPkgfromNCBI` and `forgeBSgenomeDataPkgfromUCSC`
-which allow the user to forge BSgenome data packages with sequence data files
-sourced from NCBI or UCSC respectively.
+For other genome assemblies please consult the _Advanced BSgenomeForge usage_
+vignettes also provided in this package.
 
 
 # Installation

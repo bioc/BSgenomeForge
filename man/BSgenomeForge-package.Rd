@@ -20,7 +20,7 @@
 
   For an overview of the functionality provided by the package, please see the
   vignette:
-  \code{vignette("UsingBSgenomeForge", package="BSgenomeForge")}
+  \code{vignette("QuickBSgenomeForge", package="BSgenomeForge")}
   }
 
 \author{
