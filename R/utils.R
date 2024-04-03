@@ -115,6 +115,8 @@ abbreviate_organism_name <- function(organism)
 
 check_pkg_maintainer <- function(pkg_maintainer)
 {
+    if (!(isSingleString(pkg_maintainer) && nzchar(pkg_maintainer)))
+        stop(wmsg("'pkg_maintainer' must be a single (non-empty) string"))
     pattern <- "\\<[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\>"
     if (!grepl(pattern, pkg_maintainer, ignore.case=TRUE))
         stop(wmsg("please provide a valid email address"))
@@ -136,15 +138,10 @@ organism2biocview <- function(organism)
 
 build_Rexpr_as_string <- function(seqnames)
 {
+    stopifnot(is.character(seqnames))
     if (length(seqnames) == 0L)
         return("character(0)")
     paste0('c', '(', paste0('"', seqnames, '"', collapse=","), ')')
-}
-
-move_file_to_datapkg <- function(filepath, pkg_dir)
-{
-    to <- file.path(pkg_dir, "inst", "extdata", basename(filepath))
-    file.rename(filepath, to)
 }
 
 

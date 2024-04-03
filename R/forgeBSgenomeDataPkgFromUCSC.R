@@ -74,8 +74,7 @@ forgeBSgenomeDataPkgFromUCSC <- function(genome, organism,
         stop(wmsg("'genome' must be a single (non-empty) string"))
     if (!isSingleString(organism) || organism == "")
         stop(wmsg("'organism' must be a single (non-empty) string"))
-    if (!isSingleString(pkg_maintainer) || pkg_maintainer == "")
-        stop(wmsg("'pkg_maintainer' must be a single (non-empty) string"))
+    check_pkg_maintainer(pkg_maintainer)
     if (identical(pkg_author, NA)) {
         pkg_author <- pkg_maintainer
     } else if (!isSingleString(pkg_author) || pkg_author == "") {
@@ -111,38 +110,31 @@ forgeBSgenomeDataPkgFromUCSC <- function(genome, organism,
                                               goldenPath.url=goldenPath.url)
     }
     sorted_twobit_file <- file.path(tempdir(), "single_sequences.2bit")
-    twobit_file <- .sort_twobit_file2(twobit_file, sorted_twobit_file,
-                                      chrominfo, genome)
+    .sort_twobit_file2(twobit_file, sorted_twobit_file, chrominfo, genome)
 
     organism <- format_organism(organism)
     abbr_organism <- abbreviate_organism_name(organism)
     pkgname <- make_pkgname(abbr_organism, "UCSC", genome)
-    pkgtitle <- .make_pkgtitle_for_UCSC_datapkg(organism, genome)
-    pkgdesc <- .make_pkgdesc_for_UCSC_datapkg(organism, genome)
-    check_pkg_maintainer(pkg_maintainer)
+    pkg_title <- .make_pkgtitle_for_UCSC_datapkg(organism, genome)
+    pkg_desc <- .make_pkgdesc_for_UCSC_datapkg(organism, genome)
     biocview <- organism2biocview(organism)
-    seqnames <- build_Rexpr_as_string(chrominfo[ , "chrom"])
-    circ_seqs <- build_Rexpr_as_string(circ_seqs)
+    forge_function <- "forgeBSgenomeDataPkgFromUCSC"
 
-    ## Create the package.
-    origdir <- system.file("pkgtemplates", "UCSC_BSgenome_datapkg",
-                           package="BSgenomeForge")
-    symValues <- list(BSGENOMEOBJNAME=abbr_organism,
-                      PKGTITLE=pkgtitle,
-                      PKGDESCRIPTION=pkgdesc,
-                      PKGVERSION=pkg_version,
-                      PKGAUTHOR=pkg_author,
-                      PKGMAINTAINER=pkg_maintainer,
-                      PKGLICENSE=pkg_license,
-                      ORGANISM=organism,
-                      GENOME=genome,
-                      ORGANISMBIOCVIEW=biocview,
-                      SEQNAMES=seqnames,
-                      CIRCSEQS=circ_seqs)
-    pkg_dir <- createPackage(pkgname, destdir, origdir, symValues,
-                             unlink=TRUE, quiet=FALSE)[[1]]
-    move_file_to_datapkg(twobit_file, pkg_dir)
-
-    invisible(pkg_dir)
+    create_2bit_BSgenome_datapkg(sorted_twobit_file, pkgname,
+                                 BSgenome_objname=abbr_organism,
+                                 pkg_title=pkg_title,
+                                 pkg_desc=pkg_desc,
+                                 pkg_version=pkg_version,
+                                 pkg_author=pkg_author,
+                                 pkg_maintainer=pkg_maintainer,
+                                 pkg_license=pkg_license,
+                                 organism=organism,
+                                 provider="UCSC",
+                                 genome=genome,
+                                 organism_biocview=biocview,
+                                 forge_function=forge_function,
+                                 circ_seqs=circ_seqs,
+                                 destdir=destdir,
+                                 move_twobit_file=TRUE)
 }
 

@@ -111,6 +111,44 @@
     destfile
 }
 
+create_2bit_BSgenome_datapkg <-
+    function(twobit_path, pkgname, BSgenome_objname,
+             pkg_title, pkg_desc, pkg_version,
+             pkg_author, pkg_maintainer, pkg_license,
+             organism, provider, genome, organism_biocview, forge_function,
+             circ_seqs, destdir=".", move_twobit_file=FALSE)
+{
+    stopifnot(isSingleString(twobit_path),
+              isSingleString(pkgname),
+              isSingleString(destdir),
+              isTRUEorFALSE(move_twobit_file))
+    origdir <- system.file("pkgtemplates", "2bit_BSgenome_datapkg",
+                           package="BSgenomeForge", mustWork=TRUE)
+    symValues <- list(BSGENOMEOBJNAME=BSgenome_objname,
+                      PKGTITLE=pkg_title,
+                      PKGDESCRIPTION=pkg_desc,
+                      PKGVERSION=pkg_version,
+                      PKGAUTHOR=pkg_author,
+                      PKGMAINTAINER=pkg_maintainer,
+                      PKGLICENSE=pkg_license,
+                      ORGANISM=organism,
+                      PROVIDER=provider,
+                      GENOME=genome,
+                      ORGANISMBIOCVIEW=organism_biocview,
+                      CIRCSEQS=build_Rexpr_as_string(circ_seqs),
+                      FORGEFUN=forge_function)
+    stopifnot(all(vapply(symValues, isSingleString, logical(1))))
+    pkg_dir <- createPackage(pkgname, destdir, origdir, symValues,
+                             unlink=TRUE, quiet=FALSE)[[1L]]
+    to <- file.path(pkg_dir, "inst", "extdata", "single_sequences.2bit")
+    if (move_twobit_file) {
+        file.rename(twobit_path, to)
+    } else {
+        stopifnot(file.copy(twobit_path, to))
+    }
+    invisible(pkg_dir)
+}
+
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### forgeBSgenomeDataPkgFromTwobitFile()
@@ -131,8 +169,7 @@ forgeBSgenomeDataPkgFromTwobitFile <- function(filepath,
         stop(wmsg("'provider' must be a single (non-empty) string"))
     if (!isSingleString(genome) || genome == "")
         stop(wmsg("'genome' must be a single (non-empty) string"))
-    if (!isSingleString(pkg_maintainer) || pkg_maintainer == "")
-        stop(wmsg("'pkg_maintainer' must be a single (non-empty) string"))
+    check_pkg_maintainer(pkg_maintainer)
     if (identical(pkg_author, NA)) {
         pkg_author <- pkg_maintainer
     } else if (!isSingleString(pkg_author) || pkg_author == "") {
@@ -158,36 +195,26 @@ forgeBSgenomeDataPkgFromTwobitFile <- function(filepath,
     organism <- format_organism(organism)
     abbr_organism <- abbreviate_organism_name(organism)
     pkgname <- make_pkgname(abbr_organism, provider, genome)
-    pkgtitle <- .make_pkgtitle(organism, provider, genome)
-    pkgdesc <- .make_pkgdesc(organism, provider, genome)
-    check_pkg_maintainer(pkg_maintainer)
+    pkg_title <- .make_pkgtitle(organism, provider, genome)
+    pkg_desc <- .make_pkgdesc(organism, provider, genome)
     biocview <- organism2biocview(organism)
-    circ_seqs <- build_Rexpr_as_string(circ_seqs)
+    forge_function <- "forgeBSgenomeDataPkgFromTwobitFile"
 
-    ## Create the package.
-    origdir <- system.file("pkgtemplates", "2bit_BSgenome_datapkg",
-                           package="BSgenomeForge")
-    symValues <- list(BSGENOMEOBJNAME=abbr_organism,
-                      PKGTITLE=pkgtitle,
-                      PKGDESCRIPTION=pkgdesc,
-                      PKGVERSION=pkg_version,
-                      PKGAUTHOR=pkg_author,
-                      PKGMAINTAINER=pkg_maintainer,
-                      PKGLICENSE=pkg_license,
-                      ORGANISM=organism,
-                      PROVIDER=provider,
-                      GENOME=genome,
-                      ORGANISMBIOCVIEW=biocview,
-                      CIRCSEQS=circ_seqs)
-    pkg_dir <- createPackage(pkgname, destdir, origdir, symValues,
-                             unlink=TRUE, quiet=FALSE)[[1]]
-    if (!is.null(seqnames)) {
-        move_file_to_datapkg(filepath, pkg_dir)
-    } else {
-        to <- file.path(pkg_dir, "inst", "extdata", "single_sequences.2bit")
-        stopifnot(file.copy(filepath, to))
-    }
-
-    invisible(pkg_dir)
+    create_2bit_BSgenome_datapkg(filepath, pkgname,
+                                 BSgenome_objname=abbr_organism,
+                                 pkg_title=pkg_title,
+                                 pkg_desc=pkg_desc,
+                                 pkg_version=pkg_version,
+                                 pkg_author=pkg_author,
+                                 pkg_maintainer=pkg_maintainer,
+                                 pkg_license=pkg_license,
+                                 organism=organism,
+                                 provider=provider,
+                                 genome=genome,
+                                 organism_biocview=biocview,
+                                 forge_function=forge_function,
+                                 circ_seqs=circ_seqs,
+                                 destdir=destdir,
+                                 move_twobit_file=!is.null(seqnames))
 }
 

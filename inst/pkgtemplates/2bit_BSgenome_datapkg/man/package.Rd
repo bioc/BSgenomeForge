@@ -31,7 +31,7 @@
     \item The \code{\link[BSgenome]{available.genomes}} function
           in the \pkg{BSgenome} software package.
 
-    \item The \link[BSgenomeForge]{forgeBSgenomeDataPkgFromTwobitFile}
+    \item The \link[BSgenomeForge]{@FORGEFUN@}
           function in the \pkg{BSgenomeForge} package that was used to
           create this package.
   }
