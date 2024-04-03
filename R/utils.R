@@ -16,14 +16,30 @@ load_package_gracefully <- function(package, ...)
              "\n\n    BiocManager::install(\"", package, "\")")
 }
 
+### If 'collapse' is FALSE (the default), returns a logical vector parallel
+### to 'x'. Otherwise, returns a single logical TRUE or FALSE.
 ### TODO: Move this to Biostrings (put it in same file as replaceAmbiguities).
-hasAmbiguities <- function(x)
+hasAmbiguities <- function(x, other.than.N=FALSE, collapse=FALSE)
 {
-    stopifnot(is(x, "DNAStringSet"))
-    old <- setdiff(names(IUPAC_CODE_MAP), DNA_BASES)
-    af <- alphabetFrequency(x, collapse=TRUE)
-    stopifnot(all(old %in% names(af)))
-    sum(af[old]) != 0L
+    stopifnot(is(x, "DNAStringSet"),
+              isTRUEorFALSE(other.than.N),
+              isTRUEorFALSE(collapse))
+    ambig_letters <- setdiff(names(IUPAC_CODE_MAP), DNA_BASES)
+    if (other.than.N)
+        ambig_letters <- setdiff(ambig_letters, "N")
+    af <- alphabetFrequency(x, collapse=collapse)
+    if (collapse) {
+        ## 'af' is a named integer vector.
+        stopifnot(all(ambig_letters %in% names(af)))
+        ambig_count <- sum(af[ambig_letters])
+    } else {
+        ## 'af' is an integer matrix with 1 row per sequence in 'x'.
+        stopifnot(all(ambig_letters %in% colnames(af)))
+        ambig_count <- rowSums(af[ , ambig_letters, drop=FALSE])
+        if (!is.null(names(x)))
+            names(ambig_count) <- names(x)
+    }
+    ambig_count != 0L
 }
 
 ### Returns TRUE if 'assembly_accession' is a GenBank accession, or FALSE

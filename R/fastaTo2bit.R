@@ -74,8 +74,9 @@ fastaTo2bit <- function(origfile, destfile, assembly_accession=NA)
     if (!is.na(assembly_accession))
         dna <- .sort_and_rename_fasta_sequences(dna, assembly_accession)
 
-    if (hasAmbiguities(dna)) {
-        dna <- replaceAmbiguities(dna)
+    idx <- which(hasAmbiguities(dna, other.than.N=TRUE))
+    if (length(idx) != 0L) {
+        dna[idx] <- replaceAmbiguities(dna[idx])
         warning(wmsg("the DNA sequences in FASTA file ", origfile, " contain ",
                      "IUPAC ambiguity letters not supported by ",
                      "the 2bit format --> replaced them with N's"))
