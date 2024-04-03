@@ -16,6 +16,16 @@ load_package_gracefully <- function(package, ...)
              "\n\n    BiocManager::install(\"", package, "\")")
 }
 
+### TODO: Move this to Biostrings (put it in same file as replaceAmbiguities).
+hasAmbiguities <- function(x)
+{
+    stopifnot(is(x, "DNAStringSet"))
+    old <- setdiff(names(IUPAC_CODE_MAP), DNA_BASES)
+    af <- alphabetFrequency(x, collapse=TRUE)
+    stopifnot(all(old %in% names(af)))
+    sum(af[old]) != 0L
+}
+
 ### Returns TRUE if 'assembly_accession' is a GenBank accession, or FALSE
 ### if it's a RefSeq accession, or an error if it's none.
 is_GenBank_accession <- function(assembly_accession)

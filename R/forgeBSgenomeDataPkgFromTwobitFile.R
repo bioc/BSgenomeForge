@@ -19,9 +19,9 @@
     ans
 }
 
-### Same checks as check_circ_seqs() plus the "cannot be empty" check.
-.check_seqnames <- function(seqnames)
+.check_seqnames <- function(seqnames, filepath, file_seqnames)
 {
+    ## Same checks as check_circ_seqs() plus the "cannot be empty" check.
     if (is.null(seqnames))
         return()
     if (!is.character(seqnames))
@@ -35,6 +35,50 @@
         stop(wmsg("'seqnames' cannot contain empty strings"))
     if (anyDuplicated(seqnames))
         stop(wmsg("'seqnames' cannot contain duplicate values"))
+
+    bad_seqnames <- setdiff(seqnames, file_seqnames)
+    if (length(bad_seqnames) != 0L) {
+        errmsg <- c("sequence name(s) in 'seqnames' not in file ",
+                    filepath, ": ", paste(bad_seqnames, collapse=", "))
+        stop(wmsg(errmsg))
+    }
+}
+
+.normarg_circ_seqs <- function(circ_seqs, filepath, file_seqnames,
+                               seqnames=NULL)
+{
+    check_circ_seqs(circ_seqs)  # shallow check
+
+    if (is.null(seqnames)) {
+        effective_seqnames <- file_seqnames
+        where <- c("file ", filepath)
+    } else {
+        effective_seqnames <- seqnames
+        where <- "'seqnames'"
+    }
+    if (is.null(circ_seqs)) {
+        circ_flags <- tolower(effective_seqnames) %in%
+                      tolower(DEFAULT_CIRC_SEQS)
+        circ_seqs <- effective_seqnames[circ_flags]
+        if (length(circ_seqs) == 0L) {
+            msg <- c("based on their names we didn't see any circular ",
+                     "sequences in ", where, " (this is just a guess!)")
+        } else {
+            msg <- c("the following circular sequences were guessed based ",
+                     "on their names: ", paste(circ_seqs, collapse=", "))
+        }
+        warning(wmsg("you didn't specify 'circ_seqs' --> ", msg))
+        return(circ_seqs)
+    }
+
+    ## Deep 'circ_seqs' check.
+    bad_circ_seqs <- setdiff(circ_seqs, effective_seqnames)
+    if (length(bad_circ_seqs) != 0L) {
+        errmsg <- c("sequence name(s) in 'circ_seqs' not in ", where, ": ",
+                    paste(bad_circ_seqs, collapse=", "))
+        stop(wmsg(errmsg))
+    }
+    circ_seqs
 }
 
 .make_pkgtitle <- function(organism, provider, genome)
@@ -98,39 +142,13 @@ forgeBSgenomeDataPkgFromTwobitFile <- function(filepath,
         stop(wmsg("'pkg_version' must be a single (non-empty) string"))
     if (!isSingleString(pkg_license) || pkg_license == "")
         stop(wmsg("'pkg_license' must be a single (non-empty) string"))
-    .check_seqnames(seqnames)   # shallow check
-    check_circ_seqs(circ_seqs)  # shallow check
     if (!isSingleString(destdir) || destdir == "")
         stop(wmsg("'destdir' must be a single (non-empty) string"))
 
-    all_seqnames <- .get_seqnames_from_twobit_file(filepath)
-
-    ## Deep 'seqnames' check.
-    if (!is.null(seqnames)) {
-        bad_seqnames <- setdiff(seqnames, all_seqnames)
-        if (length(bad_seqnames) != 0L) {
-            errmsg <- c("sequence name(s) in 'seqnames' not in file ",
-                        filepath, ": ", paste(bad_seqnames, collapse=", "))
-            stop(wmsg(errmsg))
-        }
-    }
-
-    ## Deep 'circ_seqs' check.
-    if (!is.null(circ_seqs)) {
-        if (is.null(seqnames)) {
-            valid_circ_seqs <- all_seqnames
-            where <- c("file ", filepath)
-        } else {
-            valid_circ_seqs <- seqnames
-            where <- "'seqnames'"
-        }
-        bad_circ_seqs <- setdiff(circ_seqs, valid_circ_seqs)
-        if (length(bad_circ_seqs) != 0L) {
-            errmsg <- c("sequence name(s) in 'circ_seqs' not in ", where, ": ",
-                        paste(bad_circ_seqs, collapse=", "))
-            stop(wmsg(errmsg))
-        }
-    }
+    file_seqnames <- .get_seqnames_from_twobit_file(filepath)
+    .check_seqnames(seqnames, filepath, file_seqnames)
+    circ_seqs <- .normarg_circ_seqs(circ_seqs, filepath, file_seqnames,
+                                    seqnames=seqnames)
 
     if (!is.null(seqnames)) {
         sorted_twobit_file <- file.path(tempdir(), "single_sequences.2bit")

@@ -46,7 +46,7 @@ fastaTo2bit(origfile, destfile, assembly_accession=NA)
 }
 
 \author{
-  Atuhurira Kirabo Kakopo
+  Atuhurira Kirabo Kakopo and Hervé Pagès
 }
 
 \seealso{
@@ -92,22 +92,26 @@ fasta_path <- downloadGenomicSequencesFromNCBI("GCA_009729545.1",
 ## Use fastaTo2bit() to convert the file to 2bit. We're using the
 ## function in its simplest form here so there won't be any sequence
 ## renaming or reordering:
-twobitpath1 <- tempfile(fileext=".2bit")
-fastaTo2bit(fasta_path, twobitpath1)
+twobit_path1 <- tempfile(fileext=".2bit")
+fastaTo2bit(fasta_path, twobit_path1)
 
 ## Take a look at the sequence names in the resulting 2bit file:
-names(import.2bit(twobitpath1))
+seqlevels(rtracklayer::TwoBitFile(twobit_path1))
+
+## Note that seqlevels(rtracklayer::TwoBitFile(.)) is equivalent to
+## names(rtracklayer::import.2bit(.)) but a lot more efficient because
+## it doesn't load the sequences.
 
 ## Use fastaTo2bit() again to convert the file to 2bit. However
 ## this time we want the function to rename and reorder the
 ## sequences as in getChromInfoFromNCBI("GCA_009729545.1"), so
 ## we set 'assembly_accession' to "GCA_009729545.1" in the call
 ## to fastaTo2bit():
-twobitpath2 <- tempfile(fileext=".2bit")
-fastaTo2bit(fasta_path, twobitpath2, assembly_accession="GCA_009729545.1")
+twobit_path2 <- tempfile(fileext=".2bit")
+fastaTo2bit(fasta_path, twobit_path2, assembly_accession="GCA_009729545.1")
 
 ## Take a look at the sequence names in the resulting 2bit file:
-names(import.2bit(twobitpath2))
+seqlevels(rtracklayer::TwoBitFile(twobit_path2))
 
 ## ---------------------------------------------------------------------
 ## USING FASTA FILE FROM **RefSeq** ASSEMBLY
@@ -118,13 +122,32 @@ names(import.2bit(twobitpath2))
 fasta_path <- downloadGenomicSequencesFromNCBI("GCF_009729545.1",
                                                destdir=tempdir())
 
-twobitpath1 <- tempfile(fileext=".2bit")
-fastaTo2bit(fasta_path, twobitpath1)
-names(import.2bit(twobitpath1))
+twobit_path1 <- tempfile(fileext=".2bit")
+fastaTo2bit(fasta_path, twobit_path1)
+seqlevels(rtracklayer::TwoBitFile(twobit_path1))
 
-twobitpath2 <- tempfile(fileext=".2bit")
-fastaTo2bit(fasta_path, twobitpath2, assembly_accession="GCF_009729545.1")
-names(import.2bit(twobitpath2))
+twobit_path2 <- tempfile(fileext=".2bit")
+fastaTo2bit(fasta_path, twobit_path2, assembly_accession="GCF_009729545.1")
+seqlevels(rtracklayer::TwoBitFile(twobit_path2))
+
+## ---------------------------------------------------------------------
+## USING A FASTA FILE WITH IUPAC AMBIGUITY LETTERS
+## ---------------------------------------------------------------------
+
+## Download the FASTA file containing the genomic sequences for
+## for Escherichia coli assembly ASM1484v1 (see
+## https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000014845.1/):
+fasta_path <- downloadGenomicSequencesFromNCBI("GCF_000014845.1",
+                                               destdir=tempdir())
+
+## The DNA sequences in this file contain IUPAC ambiguity letters
+## not supported by the 2bit format, so fastaTo2bit() will replace
+## them with N's and issue a warning:
+twobit_path <- tempfile(fileext=".2bit")
+fastaTo2bit(fasta_path, twobit_path)  # warning!
+
+## Use suppressWarnings() to suppress the warning:
+suppressWarnings(fastaTo2bit(fasta_path, twobit_path))
 }
 
 \keyword{utilities}

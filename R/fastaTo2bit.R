@@ -73,6 +73,14 @@ fastaTo2bit <- function(origfile, destfile, assembly_accession=NA)
     dna <- readDNAStringSet(origfile)
     if (!is.na(assembly_accession))
         dna <- .sort_and_rename_fasta_sequences(dna, assembly_accession)
+
+    if (hasAmbiguities(dna)) {
+        dna <- replaceAmbiguities(dna)
+        warning(wmsg("the DNA sequences in FASTA file ", origfile, " contain ",
+                     "IUPAC ambiguity letters not supported by ",
+                     "the 2bit format --> replaced them with N's"))
+    }
+
     ## Export file as 2bit.
     rtracklayer::export.2bit(dna, destfile)
 }
