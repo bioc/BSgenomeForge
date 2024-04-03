@@ -53,7 +53,7 @@ drop_rows_with_NA_accns <- function(chrominfo, accession_col)
 ###   reconstructed <- paste0(prefix_suffix[ , 1], prefix_suffix[ , 2])
 ###   stopifnot(identical(x, reconstructed))
 .split_suffix <- function(x, character_class)
-{   
+{
     pattern <- sprintf("^.*[^%s]([%s]*)$", character_class, character_class)
     suffix <- sub(pattern, "\\1", x, perl=TRUE)
     prefix <- substr(x, 1L, nchar(x) - nchar(suffix))
@@ -110,6 +110,12 @@ check_pkg_maintainer <- function(pkg_maintainer)
         stop(wmsg("please provide a valid email address"))
 }
 
+make_pkgname <- function(abbr_organism, provider, genome)
+{
+    part4 <- gsub("[^0-9a-zA-Z.]", "", genome)
+    paste("BSgenome", abbr_organism, provider, part4, sep=".")
+}
+
 organism2biocview <- function(organism)
 {
     parts <- strsplit(organism, " +")[[1]]
@@ -120,7 +126,7 @@ organism2biocview <- function(organism)
 
 build_Rexpr_as_string <- function(seqnames)
 {
-    if (length(seqnames) == 0)
+    if (length(seqnames) == 0L)
         return("character(0)")
     paste0('c', '(', paste0('"', seqnames, '"', collapse=","), ')')
 }
@@ -143,9 +149,10 @@ check_circ_seqs <- function(circ_seqs)
         return()
     if (!is.character(circ_seqs))
         stop(wmsg("'circ_seqs' must be NULL or a character vector"))
+    ## "primary key" constraints (see GenomeInfoDb:::is_primary_key)
     if (anyNA(circ_seqs))
         stop(wmsg("'circ_seqs' cannot contain NA's"))
-    if ("" %in% circ_seqs)
+    if (!all(nzchar(circ_seqs)))
         stop(wmsg("'circ_seqs' cannot contain empty strings"))
     if (anyDuplicated(circ_seqs))
         stop(wmsg("'circ_seqs' cannot contain duplicate values"))
@@ -161,7 +168,7 @@ get_circ_seqs_for_registered_assembly_or_genome <-
     if (setequal(circ_seqs, known_circ_seqs))
         return(circ_seqs)
     msg <- c("This ", what, " is registered in the GenomeInfoDb package ")
-    if (length(known_circ_seqs) == 0) {
+    if (length(known_circ_seqs) == 0L) {
         msg <- c(msg, "and it has no known circular sequences.")
     } else {
         in1string <- paste0("\"", known_circ_seqs, "\"", collapse=", ")
@@ -177,7 +184,7 @@ get_circ_seqs_for_registered_assembly_or_genome <-
 
 .assembly_has_no_assembled_molecules <- function(circ_seqs, what)
 {
-    if (length(circ_seqs) == 0)
+    if (length(circ_seqs) == 0L)
         return(character(0))
     stop(wmsg("This ", what, " contains no assembled molecules ",
               "so cannot have circular sequences."))

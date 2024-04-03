@@ -6,12 +6,6 @@
 ###
 
 
-.make_pkgname_for_UCSC_datapkg <- function(abbr_organism, genome)
-{
-    assembly_name <- gsub("[^0-9a-zA-Z.]", "", genome)
-    paste0("BSgenome.", abbr_organism, ".UCSC.", assembly_name)
-}
-
 .make_pkgtitle_for_UCSC_datapkg <- function(organism, genome)
 {
     paste0("Full genomic sequences for ", organism,
@@ -25,9 +19,9 @@
            "The sequences are stored in DNAString objects.")
 }
 
-.sort_twobit_file <- function(origfile, destfile, chrominfo, genome)
+.sort_twobit_file2 <- function(origfile, destfile, chrominfo, genome)
 {
-    dna <- import.2bit(origfile)
+    dna <- rtracklayer::import.2bit(origfile)
     m <- match(chrominfo[ , "chrom"], names(dna))
     if (length(dna) != nrow(chrominfo) || anyNA(m))
         stop(wmsg("sequence names in file ", origfile, " are not the same ",
@@ -36,7 +30,8 @@
     if (!identical(width(dna), chrominfo[ , "size"]))
         stop(wmsg("sequence lengths in file ", origfile, " are not the same ",
                   "as in 'getChromInfoFromUCSC(\"", genome, "\")'"))
-    export.2bit(dna, destfile)
+    rtracklayer::export.2bit(dna, destfile)
+    destfile
 }
 
 
@@ -116,11 +111,12 @@ forgeBSgenomeDataPkgFromUCSC <- function(genome, organism,
                                               goldenPath.url=goldenPath.url)
     }
     sorted_twobit_file <- file.path(tempdir(), "single_sequences.2bit")
-    .sort_twobit_file(twobit_file, sorted_twobit_file, chrominfo, genome)
+    twobit_file <- .sort_twobit_file2(twobit_file, sorted_twobit_file,
+                                      chrominfo, genome)
 
     organism <- format_organism(organism)
     abbr_organism <- abbreviate_organism_name(organism)
-    pkgname <- .make_pkgname_for_UCSC_datapkg(abbr_organism, genome)
+    pkgname <- make_pkgname(abbr_organism, "UCSC", genome)
     pkgtitle <- .make_pkgtitle_for_UCSC_datapkg(organism, genome)
     pkgdesc <- .make_pkgdesc_for_UCSC_datapkg(organism, genome)
     check_pkg_maintainer(pkg_maintainer)
@@ -145,7 +141,7 @@ forgeBSgenomeDataPkgFromUCSC <- function(genome, organism,
                       CIRCSEQS=circ_seqs)
     pkg_dir <- createPackage(pkgname, destdir, origdir, symValues,
                              unlink=TRUE, quiet=FALSE)[[1]]
-    move_file_to_datapkg(sorted_twobit_file, pkg_dir)
+    move_file_to_datapkg(twobit_file, pkg_dir)
 
     invisible(pkg_dir)
 }

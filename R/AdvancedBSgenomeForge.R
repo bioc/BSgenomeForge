@@ -628,7 +628,7 @@ forgeSeqFiles <- function(provider, genome,
     } else if (ondisk_seq_format == "2bit") {  # "2bit" format
         twobit_filename <- "single_sequences.2bit"
         twobit_filepath <- file.path(seqs_destdir, twobit_filename)
-        twobitfile <- TwoBitFile(twobit_filepath)
+        twobitfile <- rtracklayer::TwoBitFile(twobit_filepath)
         which <- GRanges(seqname, IRanges(1L, seqlengths(twobitfile)[[seqname]]))
         seq <- import(twobitfile, which=which)[[1L]]
     } else {  # "fa" and "fa.rz" formats

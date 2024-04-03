@@ -22,12 +22,6 @@
     .extract_assembly_name_from_ftp_file_prefix(ftp_dir[2])
 }
 
-.make_pkgname_for_NCBI_datapkg <- function(abbr_organism, assembly_name)
-{
-    part4 <- gsub("[^0-9a-zA-Z.]", "", assembly_name)
-    paste0("BSgenome.", abbr_organism, ".NCBI.", part4)
-}
-
 .make_pkgtitle_for_NCBI_datapkg <- function(organism, assembly_name)
 {
     paste0("Full genomic sequences for ", organism,
@@ -165,7 +159,7 @@ forgeBSgenomeDataPkgFromNCBI <- function(assembly_accession,
     fastaTo2bit(fasta_file, sorted_twobit_file, assembly_accession)
 
     abbr_organism <- abbreviate_organism_name(organism)
-    pkgname <- .make_pkgname_for_NCBI_datapkg(abbr_organism, assembly_name)
+    pkgname <- make_pkgname(abbr_organism, "NCBI", assembly_name)
     pkgtitle <- .make_pkgtitle_for_NCBI_datapkg(organism, assembly_name)
     pkgdesc <- .make_pkgdesc_for_NCBI_datapkg(organism, assembly_name,
                                               assembly_accession)

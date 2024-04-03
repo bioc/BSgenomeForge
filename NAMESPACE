@@ -28,6 +28,9 @@ exportClasses(
 ###
 
 export(
+    ## forgeBSgenomeDataPkgFromTwobitFile.R:
+    forgeBSgenomeDataPkgFromTwobitFile,
+
     ## downloadGenomicSequencesFromNCBI.R:
     downloadGenomicSequencesFromNCBI,
 
