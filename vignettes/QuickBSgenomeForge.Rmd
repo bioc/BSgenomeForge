@@ -3,7 +3,7 @@ title: "A quick introduction to the BSgenomeForge package"
 author:
 - name: "Atuhurira Kirabo Kakopo"
 - name: "Hervé Pagès"
-date: "Modified: March 30, 2024; Compiled: `r format(Sys.time(), '%B %d, %Y')`"
+date: "Modified: April 8, 2024; Compiled: `r format(Sys.time(), '%B %d, %Y')`"
 package: BSgenomeForge
 vignette: |
   %\VignetteIndexEntry{A quick introduction to the BSgenomeForge package}
@@ -49,7 +49,7 @@ vignettes also provided in this package.
 # Installation
 
 ```{r, eval=FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE))
+if (!require("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 BiocManager::install("BSgenomeForge")
 ```
@@ -86,7 +86,7 @@ example below:
 forgeBSgenomeDataPkgFromNCBI(assembly_accession="GCA_008369605.1",
                              pkg_maintainer="Jane Doe <janedoe@gmail.com>",
                              organism="Vibrio cholerae",
-                             circ_seqs = c("1", "2", "unnamed"))
+                             circ_seqs=c("1", "2", "unnamed"))
 ```
 
 Check `?forgeBSgenomeDataPkgFromNCBI` for more information.
