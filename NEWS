@@ -1,3 +1,26 @@
+VERSION 1.4.0
+-------------
+
+NEW FEATURES
+
+    o Add forgeBSgenomeDataPkgFromTwobitFile()
+
+    o fastaTo2bit() improvement: the function now automatically replaces IUPAC
+      ambiguity letters not supported by the 2bit format with N's and issue
+      a warning.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o The vignette documenting the seed-based forging process that used to
+      be in the BSgenome software package is now in the BSgenomeForge package.
+      This vignette used to be called the "BSgenomeForge vignette" but it has
+      now be renamed the "Advanced BSgenomeForge usage" vignette.
+
+    o All the tools related to the seed-based forging process and used by
+      the new "Advanced BSgenomeForge usage" vignette are now in the
+      BSgenomeForge package.
+
+
 VERSION 1.2.0
 -------------
 
