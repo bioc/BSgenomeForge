@@ -15,7 +15,7 @@ test_that("sort_and_rename_fasta_sequences() works with GCA_009729545.1", {
                     "WFIY01000003.1 blah blah",
                     "WFIY01000002.1 blah blah blah",
                     "WFIY01000001.1 blah blah blah blah")
-    expected_seqnames <- c("contig_1", "contig_2", "contig_3", "contig_4")
+    expected_seqnames <- paste0("contig_", 4:1)
 
     dna2 <- sort_and_rename_fasta_sequences(dna, "GCA_009729545.1")
     expect_identical(names(dna2), expected_seqnames)
