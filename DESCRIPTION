@@ -1,5 +1,5 @@
 Package: BSgenomeForge
-Title: Forge BSgenome data packages
+Title: Forge your own BSgenome data package
 Description: A set of tools to forge BSgenome data packages. Supersedes the
 	old seed-based tools from the BSgenome software package. This package
 	allows the user to create a BSgenome data package in one function call,
